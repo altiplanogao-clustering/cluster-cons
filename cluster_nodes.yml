@@ -1,0 +1,33 @@
+---
+node100: &node100
+  hostname: hadoop-node100
+  ip: 192.168.100.100
+
+node101: &node101
+  hostname: hadoop-node101
+  ip: 192.168.100.101
+
+node102: &node102
+  hostname: hadoop-node102
+  ip: 192.168.100.102
+
+node103: &node103
+  hostname: hadoop-node103
+  ip: 192.168.100.103
+
+node104: &node104
+  hostname: hadoop-node104
+  ip: 192.168.100.104
+
+nodes:
+  - *node100
+  - *node101
+  - *node102
+  - *node103
+  - *node104
+
+slaves:
+  - *node102
+  - *node103
+  - *node104
+

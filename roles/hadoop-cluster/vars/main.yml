@@ -1,0 +1,12 @@
+---
+hadoop_dirname: /usr/lib/hadoop
+
+hadoop_group: hadoop
+hadoop_user: hadoop
+hdfs_user: hdfs
+yarn_user: yarn
+mapred_user: mapred
+
+#hadoop_path = hadoop_dirname + hadoop_basename
+hadoop_path: /usr/lib/hadoop/{{ hadoop_basename }}
+hadoop_conf_dir: /etc/hadoop/conf

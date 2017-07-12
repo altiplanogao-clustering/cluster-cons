@@ -1,0 +1,29 @@
+---
+
+- name: check if namenode formatted
+  stat: path="{{ cluster_vars.dfs_namenode_name_dir }}/current/VERSION"
+  register: namenodeversionfile
+
+# - name: format namenode pre
+#   debug: msg="formatted{{":"}} {{ namenodeversionfile.stat.exists }}, {{ cluster_vars.dfs_namenode_name_dir }}/current/VERSION , su hadoop -c \"$HADOOP_PREFIX/bin/hdfs namenode -format\""
+#   when: is_namenode and ( not namenodeversionfile.stat.exists )
+
+- name: format namenode
+  raw: "su {{ hadoop_user }} -c \"$HADOOP_PREFIX/bin/hdfs namenode -format\""
+  when: is_namenode and ( not namenodeversionfile.stat.exists )
+
+- name: stop hdfs
+  raw: "su {{ hadoop_user }} -c \"$HADOOP_PREFIX/sbin/stop-dfs.sh\""
+  when: is_namenode
+
+- name: start hdfs
+  raw: "su {{ hadoop_user }} -c \"$HADOOP_PREFIX/sbin/start-dfs.sh\""
+  when: is_namenode
+
+- name: stop yarn
+  raw: "su {{ hadoop_user }} -c \"$HADOOP_PREFIX/sbin/stop-yarn.sh\""
+  when: is_resource_mgr
+
+- name: start yarn
+  raw: "su {{ hadoop_user }} -c \"$HADOOP_PREFIX/sbin/start-yarn.sh\""
+  when: is_resource_mgr

@@ -1,0 +1,25 @@
+---
+
+- name: prepare files
+  hosts: local
+
+  roles:
+    - local_prepare
+
+- name: Install standalone hadoop
+  hosts: hadoop_standalone
+  become: yes
+  become_method: sudo
+
+  roles:
+    - jdk
+    - hadoop-standalone
+
+- name: Install hadoop cluster
+  hosts: hadoop_cluster
+  become: yes
+  become_method: sudo
+
+  roles:
+    - jdk
+    - hadoop-cluster

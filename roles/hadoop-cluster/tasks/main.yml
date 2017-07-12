@@ -1,0 +1,46 @@
+---
+
+- setup:
+
+- include_vars: file='../../../vars/resources.yml'
+- include_vars: '{{ item }}'
+  with_first_found:
+  - files:
+      - '{{ ansible_os_family }}.yml'
+      - 'default.yml'
+    paths: '../vars/os'
+
+- name: Install the dependence packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: '{{ hadoop_dependency }}'
+  # when: ansible_os_family == "Debian"
+
+- group: name={{ hadoop_group }} state=present
+- user: name={{ hadoop_user }} comment="Hadoop" group={{ hadoop_group }} shell=/bin/bash password=hadoop
+- authorized_key: user={{ hadoop_user }} key="{{ lookup('file', '../files/sshkeys/hadoop_rsa.pub') }}"
+- user: name={{ hdfs_user }} comment="HDFS" group={{ hadoop_group }} shell=/bin/bash password=hadoop
+- authorized_key: user={{ hdfs_user }} key="{{ lookup('file', '../files/sshkeys/hdfs_rsa.pub') }}"
+- user: name={{ yarn_user }} comment="YARN" group={{ hadoop_group }} shell=/bin/bash password=hadoop
+- authorized_key: user={{ yarn_user }} key="{{ lookup('file', '../files/sshkeys/yarn_rsa.pub') }}"
+- user: name={{ mapred_user }} comment="MAPRED" group={{ hadoop_group }} shell=/bin/bash password=hadoop
+- authorized_key: user={{ mapred_user }} key="{{ lookup('file', '../files/sshkeys/mapred_rsa.pub') }}"
+
+
+- include: install_hadoop.yml
+
+- include: config_hosts.yml
+
+# - name: export HADOOP_HOME to PATH
+#   blockinfile:
+#     path: /home/{{ hadoop_user }}/.bashrc
+#     backup: yes
+#     block: |
+#       export HADOOP_PREFIX={{ hadoop_path }}
+#       export HADOOP_HOME={{ hadoop_path }}
+#       export PATH=$PATH:$HADOOP_HOME/bin
+
+- include: config_daemons.yml
+
+- include: launch_daemons.yml

@@ -1,0 +1,2 @@
+sys_bashrc: /etc/bashrc
+user_profile: .bash_profile

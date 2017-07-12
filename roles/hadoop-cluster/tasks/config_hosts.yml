@@ -1,0 +1,67 @@
+---
+
+- include_vars: 
+    file: '../../../cluster_nodes.yml'
+    name: cluster_nodes
+
+- include_vars: 
+    file: '../../../cluster_vars.yml'
+    name: cluster_vars
+
+- name: drop etc/hosts 127.0.0.1 to hostname (avoid address binding issue)
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '^127\.0\.0\.1.*{{ ansible_hostname }}$'
+    line: "#"
+    
+
+- name: prepare etc/hosts entries
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '^{{ item.ip }} '
+    line: "{{ item.ip }} {{ item.hostname }}"
+  with_items: "{{ cluster_nodes.nodes }}"
+
+- name: prepare known_hosts entries
+  shell: ssh-keyscan -t rsa {{ item.hostname }}
+  with_items: "{{ cluster_nodes.nodes }}"
+  register: keyscans
+
+- name: prepare known_hosts
+  lineinfile: 
+    dest=/home/{{ hadoop_user }}/.ssh/known_hosts
+    create=yes
+    state=present
+    line="{{ item.stdout }}"
+    regexp="^{{ item.item.hostname }}"
+    owner={{ hadoop_user }}
+    group={{ hadoop_group }}
+  with_items: "{{ keyscans.results }}"
+
+- name: prepare known_hosts entry 0.0.0.0
+  shell: ssh-keyscan -t rsa 0.0.0.0
+  register: keyscan_0_0_0_0
+
+- name: add 0.0.0.0 to known_hosts
+  lineinfile: 
+    dest=/home/{{ hadoop_user }}/.ssh/known_hosts
+    create=yes
+    state=present
+    line="{{ keyscan_0_0_0_0.stdout }}"
+    regexp="^0.0.0.0"
+    owner={{ hadoop_user }}
+    group={{ hadoop_group }}
+
+- name: prepare known_hosts localhost
+  shell: ssh-keyscan -t rsa localhost
+  register: keyscan_localhost
+
+- name: add localhost to known_hosts
+  lineinfile: 
+    dest=/home/{{ hadoop_user }}/.ssh/known_hosts
+    create=yes
+    state=present
+    line="{{ keyscan_localhost.stdout }}"
+    regexp="^localhost"
+    owner={{ hadoop_user }}
+    group={{ hadoop_group }}

@@ -1,0 +1,70 @@
+---
+
+- name: ensure hadoop dir
+  file: path="{{ hadoop_dirname }}" state=directory
+
+- name: upload hadoop tar file
+  copy:
+    src: "{{ playbook_dir }}/roles/local_prepare/files/{{ hadoop_tar_filename }}"
+    dest: "{{ hadoop_dirname }}/{{ hadoop_tar_filename }}"
+
+- name: delete hadoop for debug
+  file: path="{{ hadoop_path }}" state=absent
+
+- name: delete hadoop_conf_dir for debug
+  file: path="{{ hadoop_conf_dir }}" state=absent
+
+- name: check unarchive hadoop directory
+  stat:
+    path: "{{ hadoop_path }}"
+  register: hadoopfstat
+
+- name: unarchive hadoop
+  unarchive:
+    src: "{{ hadoop_dirname }}/{{ hadoop_tar_filename }}"
+    dest: "{{ hadoop_dirname }}"
+    remote_src: True
+  when: hadoopfstat.stat.isdir is not defined
+
+# - name: upload hadoop file for debug
+#   copy:
+#     src: files/{{ hadoop_basename }}
+#     dest: "{{ hadoop_dirname }}"
+
+- name: export HADOOP_HOME, HADOOP_PREFIX ...
+  lineinfile:
+    dest: /etc/environment
+    regexp: '^{{ item }}='
+    line: '{{ item }}={{ hadoop_dirname }}/{{ hadoop_basename }}'
+  with_items:
+    - "HADOOP_HOME"
+    - "HADOOP_PREFIX"
+    - "HADOOP_HDFS_HOME"
+    - "HADOOP_YARN_HOME"
+
+- name: export HADOOP_HOME to PATH
+  lineinfile:
+    dest: '{{ sys_bashrc }}'
+    line: 'export PATH=$PATH:$HADOOP_HOME/bin'
+
+- name: fetch JAVA_HOME
+  command: /bin/bash -l -c "echo $JAVA_HOME"
+  register: fetch_java_home
+
+# - name: fetch JAVA_HOME
+#   shell: echo $JAVA_HOME
+#   register: fetch_java_home
+
+- set_fact:
+    java_home_fact: "{{ fetch_java_home.stdout }}"
+
+- name: print JAVA_HOME
+  debug: msg="{{ java_home_fact}}"
+    #" {{ ansible_env.JAVA_HOME }}"
+
+- name: set hadoop JAVA_HOME
+  lineinfile:
+    dest: "{{ hadoop_path }}/etc/hadoop/hadoop-env.sh"
+    regexp: '^export JAVA_HOME='
+    line: 'export JAVA_HOME={{ java_home_fact}}'
+
