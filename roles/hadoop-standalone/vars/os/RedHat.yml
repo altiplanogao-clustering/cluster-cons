@@ -1,6 +1,0 @@
-sys_bashrc: /etc/bashrc
-user_profile: .bash_profile
-hadoop_dependency:
-  - openssh-server
-  - openssh-clients
-  - rsync

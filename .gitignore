@@ -3,4 +3,5 @@
 vm/.vagrant/
 **/*.tar.gz
 *.log
-roles/hadoop*/files/hadoop*
+roles/**/files/hadoop*
+**/sshkeys/

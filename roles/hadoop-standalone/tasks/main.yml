@@ -8,19 +8,17 @@
   - files:
       - '{{ ansible_os_family }}.yml'
       - 'default.yml'
-    paths: '../vars/os'
-
-- include: install_hadoop.yml
+    paths: '../../hadoop-cluster/vars/os'
 
 - name: Install the dependence packages
-  package:
-    name: "{{ item }}"
-    state: present
+  package: name="{{ item }}" state=present
   with_items: '{{ hadoop_dependency }}'
-  # when: ansible_os_family == "Debian"
 
 - group: name={{ hadoop_group }} state=present
 - user: name={{ hadoop_user }} comment="Hadoop" group={{ hadoop_group }} shell=/bin/bash password=hadoop
-- authorized_key: user={{ hadoop_user }} key="{{ lookup('file', '../files/sshkeys/hadoop_rsa.pub') }}"
+- authorized_key: user={{ hadoop_user }} key="{{ lookup('file', '{{ playbook_dir }}/roles/local_prepare/sshkeys/hadoop_rsa.pub') }}"
 
+- include: config_hosts.yml
+- include: install_hadoop.yml
 - include: config_daemons.yml
+- include: launch_daemons.yml

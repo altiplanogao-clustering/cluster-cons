@@ -1,10 +1,14 @@
 ---
 
-- name: prepare known_hosts entry 0.0.0.0
+- name: ssh-keyscan {{ ":" }} 0.0.0.0
   shell: ssh-keyscan -t rsa 0.0.0.0
+  changed_when: false
   register: keyscan_0_0_0_0
-
-- name: add 0.0.0.0 to known_hosts
+- name: ssh-keyscan {{ ":" }} localhost
+  shell: ssh-keyscan -t rsa localhost
+  changed_when: false
+  register: keyscan_localhost
+- name: edit known_hosts {{ ":" }} add 0.0.0.0 to
   lineinfile: 
     dest=/home/{{ hadoop_user }}/.ssh/known_hosts
     create=yes
@@ -13,12 +17,7 @@
     regexp="^0.0.0.0"
     owner={{ hadoop_user }}
     group={{ hadoop_group }}
-
-- name: prepare known_hosts localhost
-  shell: ssh-keyscan -t rsa localhost
-  register: keyscan_localhost
-
-- name: add localhost to known_hosts
+- name: edit known_hosts {{ ":" }} add localhost
   lineinfile: 
     dest=/home/{{ hadoop_user }}/.ssh/known_hosts
     create=yes

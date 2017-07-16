@@ -45,5 +45,6 @@ if [ -f $eth1_cnf_file ]; then
 fi
 
 if [ -f /root/.profile ]; then
-    sed -i '/tty/!s/mesg n/tty -s \\&\\& mesg n/' /root/.profile
+#     sed -i '/tty/!s/mesg n/tty -s \\&\\& mesg n/' /root/.profile
+      sed -i 's/^mesg n$/tty -s \&\& mesg n/g' /root/.profile
 fi

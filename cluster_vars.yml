@@ -1,8 +1,9 @@
 ---
 
-hadoop_tmp_dir: "/home/{{ hadoop_user }}/tmp"
-dfs_namenode_name_dir: "file:///home/{{ hadoop_user }}/hadoop-data/hdfs/namenode"
-dfs_datanode_data_dir: "file:///home/{{ hadoop_user }}/hadoop-data/hdfs/datanode"
+hadoop_tmp_dir: "/tmp/hadoop_tmp/"
+dfs_namenode_name_dir_no_protocol: "/home/{{ hdfs_user }}/hadoop-data/hdfs/namenode"
+dfs_namenode_name_dir: "file:///home/{{ hdfs_user }}/hadoop-data/hdfs/namenode"
+dfs_datanode_data_dir: "file:///home/{{ hdfs_user }}/hadoop-data/hdfs/datanode"
 
 fs_defaultFS: "hdfs://{{ cluster_nodes.node100.hostname }}:9000/"
 namenode_uri: "hdfs://{{ cluster_nodes.node100.hostname }}:9000/"

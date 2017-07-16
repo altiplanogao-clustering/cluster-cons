@@ -1,5 +1,0 @@
-sys_bashrc: /etc/bash.bashrc
-user_profile: .profile
-hadoop_dependency:
-  - ssh
-  - rsync

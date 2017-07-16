@@ -1,0 +1,28 @@
+---
+
+- name: check if namenode formatted
+  stat: path="{{ dfs_namenode_name_dir }}/current/VERSION"
+  register: namenodeversionfile
+
+- tempfile:
+    state: directory
+  register: tempdir
+  changed_when: false
+
+- name: copy launch daemon script
+  copy: 
+    src: scripts
+    dest: /root
+    # dest: "{{ tempdir.path}}"
+    owner: nobody
+    group: "{{ hadoop_group }}"
+    mode: 0755
+
+- name: format namenode
+  # raw: su {{ hadoop_user }} -l -c "{{ tempdir.path }}/scripts/format_namenode.sh"
+  raw: su {{ hadoop_user }} -l -c "/root/scripts/format_namenode.sh"
+  when: is_namenode and ( not namenodeversionfile.stat.exists )
+- name: start all
+  command: su {{ hadoop_user }} -l -c "/root/scripts/start-all.sh"
+
+

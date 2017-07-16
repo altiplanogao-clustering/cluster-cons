@@ -9,7 +9,7 @@ controller ansible_connection=local
 hadoop-node100 ansible_host=192.168.100.100 ansible_user=swift ansible_become_user=root ansible_become_pass=passw0rd
 
 [yarn_resource_mgr]
-hadoop-node101 ansible_host=192.168.100.101 ansible_user=swift ansible_become_user=root ansible_become_pass=passw0rd
+hadoop-node101 ansible_host=192.168.100.101 ansible_user=swift ansible_become_user=root ansible_become_pass=passw0rd is_historyserver=true is_proxyserver=true
 
 [hdfs_secondarynamenode]
 
@@ -18,10 +18,10 @@ hadoop-node102 ansible_host=192.168.100.102 ansible_user=swift ansible_become_us
 hadoop-node103 ansible_host=192.168.100.103 ansible_user=swift ansible_become_user=root ansible_become_pass=passw0rd
 hadoop-node104 ansible_host=192.168.100.104 ansible_user=swift ansible_become_user=root ansible_become_pass=passw0rd
 
-[yarn_webapp_proxy]
+[yarn_proxyserver]
 # hadoop5 ansible_host=192.168.100.105 ansible_user=swift ansible_become_user=root ansible_become_pass=passw0rd
 
-[mr_his_server]
+[historyserver]
 # hadoop6 ansible_host=192.168.100.106 ansible_user=swift ansible_become_user=root ansible_become_pass=passw0rd
 
 
@@ -33,7 +33,7 @@ hdfs_slaves
 [yarns:children]
 yarn_resource_mgr
 hdfs_slaves
-yarn_webapp_proxy
+yarn_proxyserver
 
 [hadoop_manager:children]
 hdfs_namenode
@@ -43,4 +43,4 @@ yarn_resource_mgr
 [hadoop_cluster:children]
 hdfs
 yarns
-mr_his_server
+historyserver

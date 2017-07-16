@@ -6,6 +6,11 @@ hadoop_user: hadoop
 hdfs_user: hdfs
 yarn_user: yarn
 mapred_user: mapred
+hadoop_users:
+  - hadoop
+  - hdfs
+  - yarn
+  - mapred
 
 #hadoop_path = hadoop_dirname + hadoop_basename
 hadoop_path: /usr/lib/hadoop/{{ hadoop_basename }}

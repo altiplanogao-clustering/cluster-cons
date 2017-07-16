@@ -7,3 +7,6 @@ hadoop_user: hadoop
 #hadoop_path = hadoop_dirname + hadoop_basename
 hadoop_path: /usr/lib/hadoop/{{ hadoop_basename }}
 hadoop_conf_dir: /etc/hadoop/conf
+
+dfs_namenode_name_dir: "file:///home/{{ hadoop_user }}/hadoop-data/hdfs/namenode"
+dfs_datanode_data_dir: "file:///home/{{ hadoop_user }}/hadoop-data/hdfs/datanode"

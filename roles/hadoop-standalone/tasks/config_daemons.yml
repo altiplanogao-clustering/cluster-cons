@@ -1,8 +1,8 @@
 ---
 
-- name: configure ssh keys
+- name: configure user's ssh keys
   copy:
-    src: ../files/sshkeys/{{ item.private_key }}
+    src: "{{ playbook_dir }}/roles/local_prepare/sshkeys/{{ item.private_key }}"
     dest: "/home/{{ item.user }}/.ssh/{{ item.file }}"
     owner: "{{ item.user }}"
     group: "{{ hadoop_group }}"
@@ -11,12 +11,10 @@
     - {private_key: hadoop_rsa, file: id_rsa, user: "{{ hadoop_user }}"}
     - {private_key: hadoop_rsa.pub, file: id_rsa.pub, user:  "{{ hadoop_user }}"}
 
-- name: ensure hadoop_conf_dir dir
+- name: mkdir hadoop_conf_dir
   file: path="{{ hadoop_conf_dir }}" state=directory
-
-- name: copy files
-  shell: cp -rf {{ hadoop_path }}/etc/hadoop/* {{ hadoop_conf_dir }}
-
+# - name: copy files
+#   shell: cp -rf {{ hadoop_path }}/etc/hadoop/* {{ hadoop_conf_dir }}
 - name: configure daemons conf file
   template:
     src: ../templates/{{ item.template }}
@@ -26,20 +24,18 @@
     - {template: hdfs-site.xml.j2, file: hdfs-site.xml}
     - {template: yarn-site.xml.j2, file: yarn-site.xml}
     - {template: mapred-site.xml.j2, file: mapred-site.xml}
-  
-
-- name: ensure HADOOP_LOG_DIR dir
-  file: path="/home/{{ hadoop_user }}/logs" state=directory  owner="{{ hadoop_user }}" group="{{ hadoop_group}}"
-
 - name: export HADOOP_CONF_DIR ...
   lineinfile:
     dest: /etc/environment
     regexp: '^export HADOOP_CONF_DIR='
     line: export HADOOP_CONF_DIR={{ hadoop_conf_dir }}
 
+
+- name: mkdir HADOOP_LOG_DIR
+  file: path="/home/{{ hadoop_user }}/logs" state=directory  owner="{{ hadoop_user }}" group="{{ hadoop_group}}"
 - name: export LOG_DIRs
   blockinfile:
-    dest: /home/{{ item }}/.bashrc
+    dest: /home/{{ item }}/{{ user_profile}}
     # path: /home/{{ item }}/{{ user_profile }}
     backup: yes
     block: |
@@ -49,5 +45,3 @@
       export HADOOP_MAPRED_LOG_DIR=/home/{{ item }}/logs
   with_items:
     - "{{ hadoop_user }}"
-
-- include: config_hosts.yml

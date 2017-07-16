@@ -4,8 +4,8 @@ is_datanode: false
 
 is_resource_mgr: false
 is_node_mgr: false
-is_webapp_proxy: false
-is_mr_his_server: false
+is_proxyserver: false
+is_historyserver: false
 
 is_hdfs: false
 is_yarn: false

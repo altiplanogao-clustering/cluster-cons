@@ -3,6 +3,7 @@
 - name: fetch JAVA_HOME, setup if absent
   command: /bin/sh -l -c "echo $JAVA_HOME"
   register: fetch_java_home
+  changed_when: False
 
 # - name: show debug                          
 #   debug: var=fetch_java_home

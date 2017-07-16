@@ -3,65 +3,56 @@
 - include_vars: 
     file: '../../../cluster_nodes.yml'
     name: cluster_nodes
-
 - include_vars: 
     file: '../../../cluster_vars.yml'
     name: cluster_vars
 
-- name: drop etc/hosts 127.0.0.1 to hostname (avoid address binding issue)
+- name: update /etc/hosts {{ ":" }} drop 127.0.0.1 to hostname (avoid address binding problem)
   lineinfile:
     dest: /etc/hosts
-    regexp: '^127\.0\.0\.1.*{{ ansible_hostname }}$'
-    line: "#"
-    
-
-- name: prepare etc/hosts entries
+    regexp: '^(127\.0\.0\.1)(.*?)({{ ansible_hostname }})$'
+    line: '#\1\2\3'
+    backrefs: yes
+- name: update /etc/hosts {{ ":" }} add hostnames
   lineinfile:
     dest: /etc/hosts
     regexp: '^{{ item.ip }} '
     line: "{{ item.ip }} {{ item.hostname }}"
   with_items: "{{ cluster_nodes.nodes }}"
 
-- name: prepare known_hosts entries
+- name: ssh-keyscan {{ ":" }} hostnames
   shell: ssh-keyscan -t rsa {{ item.hostname }}
   with_items: "{{ cluster_nodes.nodes }}"
+  changed_when: false
   register: keyscans
-
-- name: prepare known_hosts
+- name: update known_hosts {{ ":" }} add hostnames
   lineinfile: 
-    dest=/home/{{ hadoop_user }}/.ssh/known_hosts
-    create=yes
-    state=present
-    line="{{ item.stdout }}"
-    regexp="^{{ item.item.hostname }}"
-    owner={{ hadoop_user }}
-    group={{ hadoop_group }}
+    dest=/home/{{ hadoop_user }}/.ssh/known_hosts create=yes state=present owner={{ hadoop_user }} group={{ hadoop_group }}
+    line="{{ item.stdout }}" regexp="^{{ item.item.hostname }}"
   with_items: "{{ keyscans.results }}"
-
-- name: prepare known_hosts entry 0.0.0.0
+- name: ssh-keyscan {{ ":" }} 0.0.0.0
   shell: ssh-keyscan -t rsa 0.0.0.0
+  changed_when: false
   register: keyscan_0_0_0_0
-
-- name: add 0.0.0.0 to known_hosts
+- name: update known_hosts {{ ":" }} add 0.0.0.0
   lineinfile: 
-    dest=/home/{{ hadoop_user }}/.ssh/known_hosts
-    create=yes
-    state=present
-    line="{{ keyscan_0_0_0_0.stdout }}"
-    regexp="^0.0.0.0"
-    owner={{ hadoop_user }}
-    group={{ hadoop_group }}
-
-- name: prepare known_hosts localhost
+    dest=/home/{{ hadoop_user }}/.ssh/known_hosts create=yes state=present owner={{ hadoop_user }} group={{ hadoop_group }}
+    line="{{ keyscan_0_0_0_0.stdout }}" regexp="^0.0.0.0"
+- name: ssh-keyscan {{ ":" }} localhost
   shell: ssh-keyscan -t rsa localhost
+  changed_when: false
   register: keyscan_localhost
-
-- name: add localhost to known_hosts
+- name: update known_hosts {{ ":" }} add localhost
   lineinfile: 
-    dest=/home/{{ hadoop_user }}/.ssh/known_hosts
-    create=yes
-    state=present
-    line="{{ keyscan_localhost.stdout }}"
-    regexp="^localhost"
-    owner={{ hadoop_user }}
-    group={{ hadoop_group }}
+    dest=/home/{{ hadoop_user }}/.ssh/known_hosts create=yes state=present owner={{ hadoop_user }} group={{ hadoop_group }}
+    line="{{ keyscan_localhost.stdout }}" regexp="^localhost"
+- name: duplicate known_hosts
+  shell: |
+    cp -f /home/{{ hadoop_user }}/.ssh/known_hosts /home/{{ item }}/.ssh/known_hosts
+    chown {{ item}}:{{ hadoop_group}} /home/{{ item }}/.ssh/known_hosts
+  with_items:
+    - "{{ hdfs_user }}"
+    - "{{ yarn_user }}"
+    - "{{ mapred_user }}"
+  changed_when: false
+
