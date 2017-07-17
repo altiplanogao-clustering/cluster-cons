@@ -48,9 +48,9 @@
 - name: start yarn
   raw: su - {{ yarn_user }} -l -c "/tmp/hadoop/scripts/start_yarn.sh"
   when: is_resource_mgr
-# - name: run mapred demo
-#   raw: su - {{ mapred_user }} -l -c "/tmp/hadoop/scripts/mapred_demo.sh"
-#   when: is_resource_mgr
+- name: run mapred demo
+  raw: su - {{ mapred_user }} -l -c "/tmp/hadoop/scripts/mapred_demo.sh"
+  when: is_resource_mgr
 
 
 

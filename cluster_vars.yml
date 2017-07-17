@@ -23,3 +23,5 @@ yarn_resourcemanager_admin_address: "{{ cluster_nodes.node101.hostname }}:11003"
 # ResourceManager web-ui host:port. host:port If set, overrides the hostname set in yarn.resourcemanager.hostname.
 yarn_resourcemanager_webapp_address: "{{ cluster_nodes.node101.hostname }}:8088"
 
+
+yarn_web_proxy_address:  "{{ cluster_nodes.node101.hostname }}:11011"
