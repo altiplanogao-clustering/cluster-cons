@@ -1,2 +1,3 @@
 sys_bashrc: /etc/bash.bashrc
 sys_profile: /etc/profile
+sys_envfile: /etc/profile

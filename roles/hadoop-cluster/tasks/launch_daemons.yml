@@ -15,6 +15,7 @@
 - name: format namenode
   raw: su - {{ hdfs_user }} -l -c "{{ script_path}}/scripts/format_namenode.sh"
   when: is_namenode and ( not namenodeversionfile.stat.exists )
+
 # - name: stop hdfs
 #   raw: "su - {{ hdfs_user }} -l -c \"$HADOOP_PREFIX/sbin/stop-dfs.sh\""
 #   when: is_namenode
@@ -43,13 +44,13 @@
 
 
 - name: start hdfs
-  raw: su - {{ hdfs_user }} -l -c "/tmp/hadoop/scripts/start_hdfs.sh"
+  raw: su - {{ hdfs_user }} -l -c "{{ script_path }}/scripts/start_hdfs.sh"
   when: is_namenode
 - name: start yarn
-  raw: su - {{ yarn_user }} -l -c "/tmp/hadoop/scripts/start_yarn.sh"
+  raw: su - {{ yarn_user }} -l -c "{{ script_path }}/scripts/start_yarn.sh"
   when: is_resource_mgr
 - name: run mapred demo
-  raw: su - {{ mapred_user }} -l -c "/tmp/hadoop/scripts/mapred_demo.sh"
+  raw: su - {{ mapred_user }} -l -c "{{ script_path }}/scripts/mapred_demo.sh"
   when: is_resource_mgr
 
 

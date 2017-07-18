@@ -20,33 +20,27 @@
     line: "{{ item.ip }} {{ item.hostname }}"
   with_items: "{{ cluster_nodes.nodes }}"
 
+- name: ssh-keyscan {{ ":" }} 0.0.0.0
+  shell: ssh-keyscan -t rsa 0.0.0.0
+  changed_when: false
+  register: keyscan_0_0_0_0
+- name: update known_hosts {{ ":" }} add 0.0.0.0
+  lineinfile: dest=/home/{{ hadoop_user }}/.ssh/known_hosts create=yes state=present owner={{ hadoop_user }} group={{ hadoop_group }} line="{{ keyscan_0_0_0_0.stdout }}" regexp="^0.0.0.0"
+- name: ssh-keyscan {{ ":" }} localhost
+  shell: ssh-keyscan -t rsa localhost
+  changed_when: false
+  register: keyscan_localhost
+- name: update known_hosts {{ ":" }} add localhost
+  lineinfile: dest=/home/{{ hadoop_user }}/.ssh/known_hosts create=yes state=present owner={{ hadoop_user }} group={{ hadoop_group }} line="{{ keyscan_localhost.stdout }}" regexp="^localhost"
 - name: ssh-keyscan {{ ":" }} hostnames
   shell: ssh-keyscan -t rsa {{ item.hostname }}
   with_items: "{{ cluster_nodes.nodes }}"
   changed_when: false
   register: keyscans
 - name: update known_hosts {{ ":" }} add hostnames
-  lineinfile: 
-    dest=/home/{{ hadoop_user }}/.ssh/known_hosts create=yes state=present owner={{ hadoop_user }} group={{ hadoop_group }}
-    line="{{ item.stdout }}" regexp="^{{ item.item.hostname }}"
+  lineinfile: dest=/home/{{ hadoop_user }}/.ssh/known_hosts create=yes state=present owner={{ hadoop_user }} group={{ hadoop_group }} line="{{ item.stdout }}" regexp="^{{ item.item.hostname }}"
   with_items: "{{ keyscans.results }}"
-- name: ssh-keyscan {{ ":" }} 0.0.0.0
-  shell: ssh-keyscan -t rsa 0.0.0.0
-  changed_when: false
-  register: keyscan_0_0_0_0
-- name: update known_hosts {{ ":" }} add 0.0.0.0
-  lineinfile: 
-    dest=/home/{{ hadoop_user }}/.ssh/known_hosts create=yes state=present owner={{ hadoop_user }} group={{ hadoop_group }}
-    line="{{ keyscan_0_0_0_0.stdout }}" regexp="^0.0.0.0"
-- name: ssh-keyscan {{ ":" }} localhost
-  shell: ssh-keyscan -t rsa localhost
-  changed_when: false
-  register: keyscan_localhost
-- name: update known_hosts {{ ":" }} add localhost
-  lineinfile: 
-    dest=/home/{{ hadoop_user }}/.ssh/known_hosts create=yes state=present owner={{ hadoop_user }} group={{ hadoop_group }}
-    line="{{ keyscan_localhost.stdout }}" regexp="^localhost"
-- name: duplicate known_hosts
+- name: copy known_hosts
   shell: |
     cp -f /home/{{ hadoop_user }}/.ssh/known_hosts /home/{{ item }}/.ssh/known_hosts
     chown {{ item}}:{{ hadoop_group}} /home/{{ item }}/.ssh/known_hosts

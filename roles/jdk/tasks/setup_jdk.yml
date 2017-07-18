@@ -49,8 +49,9 @@
     path: "{{ sys_profile }}"
     regexp: '^export JAVA_HOME='
     line: 'export JAVA_HOME={{ jdk_dirname }}/{{ jdk_basename }}'
+#  when: ansible_os_family == "RedHat"
 
 - name: export JAVA_HOME to PATH
   lineinfile:
-    path: '{{ sys_profile }}'
+    path: '{{ sys_envfile }}'
     line: 'export PATH=$PATH:$JAVA_HOME/bin'

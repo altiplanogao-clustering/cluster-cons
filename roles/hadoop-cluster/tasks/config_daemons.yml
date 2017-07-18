@@ -56,20 +56,35 @@
     line: export HADOOP_CONF_DIR={{ hadoop_conf_dir }}
   when: ansible_os_family == "RedHat"
 
+- file: path="/home/{{ item }}/.pam_environment" state=touch owner={{ item }} group={{ hadoop_group }} mode=0644
+  with_items:
+    - "{{ hadoop_users }}"
+- name: export LOG_DIRs
+  blockinfile:
+    dest: /home/{{ item }}/.pam_environment
+    backup: yes
+    block: |
+      HADOOP_LOG_DIR=/home/{{ item }}/logs
+      HDFS_LOG_DIR=/home/{{ item }}/logs
+      YARN_LOG_DIR=/home/{{ item }}/logs
+      HADOOP_MAPRED_LOG_DIR=/home/{{ item }}/logs
+  with_items:
+    - "{{ hadoop_users }}"
 
 - name: mkdir HADOOP_LOG_DIR
   file: path="/home/{{ item }}/logs" state=directory  owner="{{ item }}" group="{{ hadoop_group}}"
   with_items: "{{ hadoop_users }}"
 - name: export LOG_DIRs
   blockinfile:
-    dest: /home/{{ item }}/{{ user_env_file }}
+    dest: /home/{{ item[1] }}/{{ item[0] }}
     # path: /home/{{ item }}/{{ user_bashrc }}
     backup: yes
     block: |
-      export HADOOP_LOG_DIR=/home/{{ item }}/logs
-      export HDFS_LOG_DIR=/home/{{ item }}/logs
-      export YARN_LOG_DIR=/home/{{ item }}/logs
-      export HADOOP_MAPRED_LOG_DIR=/home/{{ item }}/logs
-  with_items: "{{ hadoop_users }}"
-
+      export HADOOP_LOG_DIR=/home/{{ item[1] }}/logs
+      export HDFS_LOG_DIR=/home/{{ item[1] }}/logs
+      export YARN_LOG_DIR=/home/{{ item[1] }}/logs
+      export HADOOP_MAPRED_LOG_DIR=/home/{{ item[1] }}/logs
+  with_nested:
+    - "{{ user_env_files}}"
+    - "{{ hadoop_users }}"
 
