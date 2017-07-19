@@ -7,10 +7,11 @@
   file: path="{{ hadoop_conf_dir }}" state=absent
   when: (fresh_unzip is defined) and fresh_unzip
 - name: delete hadoop-data
-  file: path="/home/{{ item }}/hadoop-data" state=absent
+  file: path="/home/{{ item[0] }}/{{ item[1]}}" state=absent
   when: (drop_data is defined) and drop_data
-  with_items:
+  with_nested:
     - "{{ hadoop_users }}"
+    - ['hadoop-data','logs']
 
 - name: mkdir hadoop
   file: path="{{ hadoop_dirname }}" state=directory
