@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<?xml version="1.0"?>
 <!--
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -13,19 +12,17 @@
   See the License for the specific language governing permissions and
   limitations under the License. See accompanying LICENSE file.
 -->
-
-<!-- Put site-specific property overrides in this file. -->
-
 <configuration>
   <property>
-      <name>fs.defaultFS</name>
-      <value>{{ cluster_vars.fs_defaultFS }}</value>
+    <name>mapreduce.jobhistory.address</name>
+    <value>{{ hadoop_vars.mr_jobhistory_address }}</value>
   </property>
-
   <property>
-    <name>hadoop.tmp.dir</name>
-    <value>{{ cluster_vars.hadoop_tmp_dir }}</value>
-    <description>A base for other temporary directories.</description>
+    <name>mapreduce.jobhistory.webapp.address</name>
+    <value>{{ hadoop_vars.mr_jobhistory_webapp_address }}</value>
   </property>
-
+  <property>  
+    <name>mapreduce.framework.name</name>  
+    <value>yarn</value>  
+  </property>
 </configuration>

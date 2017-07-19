@@ -1,10 +1,10 @@
 ---
 
 - name: check if namenode formatted
-  stat: path="{{ cluster_vars.dfs_namenode_name_dir_no_protocol }}/current/VERSION"
+  stat: path="{{ hadoop_vars.dfs_namenode_name_dir_no_protocol }}/current/VERSION"
   register: namenodeversionfile
 - set_fact: script_path="/tmp/hadoop/"
-- debug: msg="{{ cluster_vars.dfs_namenode_name_dir_no_protocol }}/current/VERSION exist-{{ namenodeversionfile }}"
+- debug: msg="{{ hadoop_vars.dfs_namenode_name_dir_no_protocol }}/current/VERSION exist-{{ namenodeversionfile }}"
   when: is_namenode
 
 - name: prepare script directory

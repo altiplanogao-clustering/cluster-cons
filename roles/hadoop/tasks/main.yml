@@ -13,9 +13,17 @@
 - include_vars: 
     file: '{{ playbook_dir }}/cluster_nodes.yml'
     name: cluster_nodes
+  when: cluster_mode
 - include_vars: 
-    file: '{{ playbook_dir }}/cluster_vars.yml'
-    name: cluster_vars
+    file: '{{ playbook_dir }}/vars/cluster_vars.yml'
+    name: hadoop_vars
+  when: cluster_mode
+- include_vars: 
+    file: '{{ playbook_dir }}/vars/standalone_vars.yml'
+    name: hadoop_vars
+  when: not cluster_mode
+- set_fact: is_namenode=true is_resource_mgr=true
+  when: not cluster_mode
 
 - name: Install the dependence packages
   package: name="{{ item }}" state=present

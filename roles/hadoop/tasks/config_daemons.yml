@@ -14,8 +14,9 @@
     rm {{ hadoop_conf_temp.path }}/yarn-site.xml
     rm {{ hadoop_conf_temp.path }}/mapred-site.xml
     cp -rf {{ hadoop_conf_temp.path }}/* {{ hadoop_conf_dir }}
+- set_fact: template_dir="{{ 'cluster' if cluster_mode else 'standalone' }}"
 - name: configure daemons conf file
-  template: src="{{ item.tplt }}" dest="{{ hadoop_conf_dir }}/{{ item.file }}"
+  template: src="{{ template_dir}}/{{ item.tplt }}" dest="{{ hadoop_conf_dir }}/{{ item.file }}"
   when: item.cond
   with_items:
     - {tplt: core-site.xml.j2, file: core-site.xml, cond: true}

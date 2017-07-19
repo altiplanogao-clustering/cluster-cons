@@ -16,6 +16,7 @@
     regexp: '^{{ item.ip }}(\s)*({{ item.hostname }})?$'
     line: '{{ item.ip }} {{ item.hostname }}'
   with_items: "{{ cluster_nodes.nodes }}"
+  when: cluster_mode
 
 # Configure Users
 - group: name={{ hadoop_group }} state=present
@@ -51,9 +52,11 @@
   with_items: "{{ cluster_nodes.nodes }}"
   changed_when: false
   register: keyscans
+  when: cluster_mode
 - name: update known_hosts {{ ":" }} add hostnames
   lineinfile: dest=/home/{{ hadoop_user }}/.ssh/known_hosts create=yes state=present owner={{ hadoop_user }} group={{ hadoop_group }} line="{{ item.stdout }}" regexp="^{{ item.item.hostname }}"
   with_items: "{{ keyscans.results }}"
+  when: cluster_mode
 - name: copy known_hosts
   shell: |
     cp -f /home/{{ hadoop_user }}/.ssh/known_hosts /home/{{ item }}/.ssh/known_hosts

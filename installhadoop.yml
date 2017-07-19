@@ -11,21 +11,23 @@
   become: yes
   become_method: sudo
   vars:
+    cluster_mode: false
     fresh_unzip: false
     drop_data: false
 
   roles:
     - jdk
-    - hadoop-standalone
+    - hadoop
 
 - name: Install hadoop cluster
   hosts: hadoop_cluster
   become: yes
   become_method: sudo
   vars:
+    cluster_mode: true
     # fresh_unzip: true
     # drop_data: true
 
   roles:
     - jdk
-    - hadoop-cluster
+    - hadoop
