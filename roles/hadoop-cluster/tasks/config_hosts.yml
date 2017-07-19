@@ -16,8 +16,9 @@
 - name: update /etc/hosts {{ ":" }} add hostnames
   lineinfile:
     dest: /etc/hosts
-    regexp: '^{{ item.ip }} '
-    line: "{{ item.ip }} {{ item.hostname }}"
+    regexp: '^({{ item.ip }})(.*?)(\s)?({{ item.hostname }})?$'
+    line: '\1\2 {{ item.hostname }}'
+    backrefs: yes
   with_items: "{{ cluster_nodes.nodes }}"
 
 - name: ssh-keyscan {{ ":" }} 0.0.0.0
