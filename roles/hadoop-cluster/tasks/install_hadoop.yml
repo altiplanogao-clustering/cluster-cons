@@ -1,5 +1,6 @@
 ---
 
+# delete hadoop installation, configuration and data
 - name: delete hadoop installation
   file: path="{{ hadoop_path }}" state=absent
   when: (fresh_unzip is defined) and fresh_unzip
@@ -13,6 +14,7 @@
     - "{{ hadoop_users }}"
     - ['hadoop-data','logs']
 
+# install hadoop files
 - name: mkdir hadoop
   file: path="{{ hadoop_dirname }}" state=directory
 - name: upload hadoop tar file
@@ -29,11 +31,7 @@
     remote_src: True
   when: hadoopfstat.stat.isdir is not defined
 
-# - name: upload hadoop file for debug
-#   copy:
-#     src: files/{{ hadoop_basename }}
-#     dest: "{{ hadoop_dirname }}"
-
+# export HADOOP environment variables
 - name: export HADOOP_HOME, HADOOP_PREFIX ...
   lineinfile:
     dest: /etc/environment
@@ -51,16 +49,14 @@
   lineinfile:
     dest: '{{ sys_bashrc }}'
     line: 'export PATH=$PATH:$HADOOP_HOME/bin'
-
 - name: fetch JAVA_HOME
   command: /bin/bash -l -c "echo $JAVA_HOME"
   changed_when: false
   register: fetch_java_home
-- set_fact: java_home_fact="{{ fetch_java_home.stdout }}"
 - debug: msg="JAVA_HOME={{ fetch_java_home.stdout}}"
 - name: set hadoop JAVA_HOME
   lineinfile:
     dest: "{{ hadoop_path }}/etc/hadoop/hadoop-env.sh"
     regexp: '^export JAVA_HOME='
-    line: 'export JAVA_HOME={{ java_home_fact}}'
+    line: 'export JAVA_HOME={{ fetch_java_home.stdout}}'
 

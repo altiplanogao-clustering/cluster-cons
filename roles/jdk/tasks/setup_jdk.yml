@@ -1,12 +1,5 @@
 ---
 - include_vars: file='../../../vars/resources.yml'
-
-
-- name: mkdir for jdk
-  file: path="{{ jdk_dirname }}" state=directory
-
-- debug: msg="os {{ ansible_os_family }}, distribution {{ ansible_distribution }}"
-
 - include_vars: '{{ item }}'
   with_first_found:
   - files:
@@ -22,16 +15,17 @@
 - name: Install the dependence packages
   package: name="{{ item }}" state=present
   with_items: '{{ dependency }}'
-  
+
+# install jdk files
+- name: mkdir for jdk
+  file: path="{{ jdk_dirname }}" state=directory
 - name: upload jdk tar file
   copy:
     src: "{{ playbook_dir }}/roles/local_prepare/files/{{ jdk_tar_filename }}"
     dest: "{{ jdk_dirname }}/{{ jdk_tar_filename }}"
-
 - name: check unarchive jdk directory
   stat: path="{{ jdk_dirname }}/{{ jdk_basename }}"
   register: jdkfstat
-
 - name: unarchive jdk
   unarchive:
     src: "{{ jdk_dirname }}/{{ jdk_tar_filename }}"
@@ -39,13 +33,7 @@
     remote_src: yes
   when: jdkfstat.stat.isdir is not defined
 
-# - name: setup java path for ubuntu
-#   template:
-#     src: ubuntu_java_home.sh.j2
-#     dest: /etc/profile.d/ubuntu_java_home.sh
-#     mode: 0755
-#   when: ansible_distribution == "Ubuntu"
-
+# export environment variable
 - name: export JAVA_HOME
   lineinfile:
     path: /etc/environment
@@ -57,7 +45,6 @@
     regexp: '^export JAVA_HOME='
     line: 'export JAVA_HOME={{ jdk_dirname }}/{{ jdk_basename }}'
 #  when: ansible_os_family == "RedHat"
-
 - name: export JAVA_HOME to PATH
   lineinfile:
     path: '{{ sys_envfile }}'

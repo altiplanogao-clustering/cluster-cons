@@ -10,15 +10,16 @@
       - 'default.yml'
     paths: '../vars/os'
 
+- include_vars: 
+    file: '{{ playbook_dir }}/cluster_nodes.yml'
+    name: cluster_nodes
+- include_vars: 
+    file: '{{ playbook_dir }}/cluster_vars.yml'
+    name: cluster_vars
+
 - name: Install the dependence packages
   package: name="{{ item }}" state=present
   with_items: '{{ hadoop_dependency }}'
-
-- group: name={{ hadoop_group }} state=present
-- user: name={{ item }} comment={{ item}} group={{ hadoop_group }} shell=/bin/bash password=hadoop
-  with_items: "{{ hadoop_users }}"
-- authorized_key: user={{ item }} key="{{ lookup('file', '{{ playbook_dir }}/roles/local_prepare/sshkeys/{{ item }}_rsa.pub') }}"
-  with_items: "{{ hadoop_users }}"
 
 - include: config_hosts.yml
 - include: install_hadoop.yml

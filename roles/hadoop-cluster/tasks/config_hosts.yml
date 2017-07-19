@@ -1,12 +1,6 @@
 ---
 
-- include_vars: 
-    file: '../../../cluster_nodes.yml'
-    name: cluster_nodes
-- include_vars: 
-    file: '../../../cluster_vars.yml'
-    name: cluster_vars
-
+# Configure /etc/hosts
 - name: update /etc/hosts {{ ":" }} drop 127.0.0.1 to hostname (avoid address binding problem)
   lineinfile:
     dest: /etc/hosts
@@ -16,23 +10,42 @@
 - name: update /etc/hosts {{ ":" }} add hostnames
   lineinfile:
     dest: /etc/hosts
-    regexp: '^({{ item.ip }})(.*?)(\s)?({{ item.hostname }})?$'
-    line: '\1\2 {{ item.hostname }}'
-    backrefs: yes
+    # regexp: '^({{ item.ip }})?(.*?)(\s)?({{ item.hostname }})?'
+    # line: '{{ item.ip }}\2 {{ item.hostname }}'
+    # backrefs: yes
+    regexp: '^{{ item.ip }}(\s)*({{ item.hostname }})?$'
+    line: '{{ item.ip }} {{ item.hostname }}'
   with_items: "{{ cluster_nodes.nodes }}"
 
-- name: ssh-keyscan {{ ":" }} 0.0.0.0
-  shell: ssh-keyscan -t rsa 0.0.0.0
-  changed_when: false
-  register: keyscan_0_0_0_0
-- name: update known_hosts {{ ":" }} add 0.0.0.0
-  lineinfile: dest=/home/{{ hadoop_user }}/.ssh/known_hosts create=yes state=present owner={{ hadoop_user }} group={{ hadoop_group }} line="{{ keyscan_0_0_0_0.stdout }}" regexp="^0.0.0.0"
+# Configure Users
+- group: name={{ hadoop_group }} state=present
+- user: name={{ item }} comment={{ item}} group={{ hadoop_group }} shell=/bin/bash password=hadoop
+  with_items: "{{ hadoop_users }}"
+- authorized_key: user={{ item }} key="{{ lookup('file', '{{ playbook_dir }}/roles/local_prepare/sshkeys/{{ item }}_rsa.pub') }}"
+  with_items: "{{ hadoop_users }}"
+- name: configure user's ssh keys
+  copy:
+    src="{{ playbook_dir }}/roles/local_prepare/sshkeys/{{ item.key }}"
+    dest="/home/{{ item.user }}/.ssh/{{ item.file }}"
+    owner="{{ item.user }}" group="{{ hadoop_group }}" mode=0600
+#  when: item.cond
+  with_items:
+    - {key: hadoop_rsa, file: id_rsa, user: "{{ hadoop_user }}", cond: "{{ is_resource_mgr or is_namenode }}" }
+    - {key: hdfs_rsa, file: id_rsa, user: "{{ hdfs_user }}", cond: "{{ is_namenode }}"}
+    - {key: yarn_rsa, file: id_rsa, user: "{{ yarn_user }}", cond: "{{ is_resource_mgr }}"}
+    - {key: hadoop_rsa.pub, file: id_rsa.pub, user: "{{ hadoop_user }}", cond: true}
+    - {key: hdfs_rsa.pub, file: id_rsa.pub, user: "{{ hdfs_user }}", cond: true}
+    - {key: yarn_rsa.pub, file: id_rsa.pub, user: "{{ yarn_user }}", cond: true}
+
+# Configure ~user/.ssh/known_hosts
 - name: ssh-keyscan {{ ":" }} localhost
-  shell: ssh-keyscan -t rsa localhost
+  shell: ssh-keyscan -t rsa {{ item}}
   changed_when: false
   register: keyscan_localhost
+  with_items: ['0.0.0.0', 'localhost']
 - name: update known_hosts {{ ":" }} add localhost
-  lineinfile: dest=/home/{{ hadoop_user }}/.ssh/known_hosts create=yes state=present owner={{ hadoop_user }} group={{ hadoop_group }} line="{{ keyscan_localhost.stdout }}" regexp="^localhost"
+  lineinfile: dest=/home/{{ hadoop_user }}/.ssh/known_hosts create=yes state=present owner={{ hadoop_user }} group={{ hadoop_group }} line="{{ item.stdout }}" regexp="^{{ item.item }}"
+  with_items: "{{ keyscan_localhost.results }}"
 - name: ssh-keyscan {{ ":" }} hostnames
   shell: ssh-keyscan -t rsa {{ item.hostname }}
   with_items: "{{ cluster_nodes.nodes }}"
