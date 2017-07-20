@@ -52,6 +52,7 @@
 - name: run mapred demo
   raw: su - {{ mapred_user }} -l -c "{{ script_path }}/scripts/mapred_demo.sh"
   when: is_resource_mgr
+  ignore_errors: yes
 
 
 

@@ -9,7 +9,15 @@ PRIVATE_KEY_DESTINATION = '/home/vagrant/.ssh/id_rsa'
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure("2") do |config|
-   config.vm.box_check_update = false
+  config.vm.box_check_update = false
+  boxes = [
+    "centos/7",
+    "debian/jessie64",
+    "ubuntu/precise64",
+    "ubuntu/trusty64",
+    "bento/opensuse-13.2",
+    "scotch/box",
+  ]
 
   (0..5).each do |i|
     ip = 100 + i
@@ -17,22 +25,8 @@ Vagrant.configure("2") do |config|
     host_name = "hadoop-node#{ip}"
     config.vm.define node_name do |node|
       node.vm.hostname = host_name
-
-      boxes = [
-        #  "ubuntu/precise64",
-         "centos/7"]
-        # "ubuntu/trusty64",
-        # "debian/jessie64",
-        # "centos/7",
-        # "ubuntu/precise64",
-        # "scotch/box"]
-        #"suse/sles11sp3"]
       node.vm.box = boxes[i % boxes.length]
- 
-  #    node.ssh.username = 'vagrant'
-  #    node.ssh.password = 'vagrant'
-  #    node.ssh.insert_key = 'true'
-  #    node.ssh.private_key_path = PRIVATE_KEY_SOURCE
+
       node.vm.network "private_network" , ip: "192.168.100.#{ip}"
       node.vm.provider "virtualbox" do |v|
         v.name = node_name

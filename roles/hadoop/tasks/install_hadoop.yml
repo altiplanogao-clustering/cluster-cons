@@ -44,10 +44,10 @@
     regexp: '^export {{ item }}='
     line: 'export {{ item }}={{ hadoop_dirname }}/{{ hadoop_basename }}'
   with_items: [ "HADOOP_HOME", "HADOOP_PREFIX", "HADOOP_HDFS_HOME", "HADOOP_YARN_HOME"]
-  when: ansible_os_family == "RedHat"
+#  when: ansible_os_family == "RedHat"
 - name: export HADOOP_HOME to PATH
   lineinfile:
-    dest: '{{ sys_bashrc }}'
+    dest: '{{ sys_profile }}'
     line: 'export PATH=$PATH:$HADOOP_HOME/bin'
 - name: fetch JAVA_HOME
   command: /bin/bash -l -c "echo $JAVA_HOME"
