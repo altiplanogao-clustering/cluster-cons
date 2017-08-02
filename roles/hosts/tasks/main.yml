@@ -1,0 +1,28 @@
+---
+
+- include_vars: 
+    file: '{{ playbook_dir }}/cluster_nodes.yml'
+    name: cluster_nodes
+  when: cluster_mode
+
+- hostname: name="{{ inventory_hostname}}"
+  # when: cluster_mode
+
+# Configure /etc/hosts
+- name: update /etc/hosts {{ ":" }} drop 127.0.0.1 to hostname (avoid address binding problem)
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '^(127\.0\.0\.1)(.*?)({{ ansible_hostname }})$'
+    line: '\1\2'
+    backrefs: yes
+  when: cluster_mode
+- name: update /etc/hosts {{ ":" }} add hostnames
+  lineinfile:
+    dest: /etc/hosts
+    # regexp: '^({{ item.ip }})?(.*?)(\s)?({{ item.hostname }})?'
+    # line: '{{ item.ip }}\2 {{ item.hostname }}'
+    # backrefs: yes
+    regexp: '^{{ item.ip }}(\s)*({{ item.hostname }})?$'
+    line: '{{ item.ip }} {{ item.hostname }}'
+  with_items: "{{ cluster_nodes.nodes }}"
+  when: cluster_mode

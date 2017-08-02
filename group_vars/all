@@ -1,3 +1,5 @@
+rcpath: resources
+
 is_namenode: false
 is_secondarynamenode: false
 is_datanode: false

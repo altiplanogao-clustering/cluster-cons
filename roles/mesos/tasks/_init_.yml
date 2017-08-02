@@ -1,0 +1,12 @@
+---
+
+- name: mkdir resource directory
+  file: path="{{ role_path }}/{{ rcpath}}" state=directory
+
+# Prepare mesos resource
+- name: check file exists
+  stat: path="{{ role_path }}/{{ rcpath}}/{{ mesos_conf.tar_file }}"
+  register: tar_stat
+- name: download mesos
+  get_url: url="{{ mesos_conf.url }}" dest="{{ role_path }}/{{ rcpath}}/{{ mesos_conf.tar_file }}"
+  when: not tar_stat.stat.exists

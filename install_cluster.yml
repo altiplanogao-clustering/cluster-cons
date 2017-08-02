@@ -1,10 +1,16 @@
 ---
 
-- name: prepare files
+- name: Prepare
   hosts: local
-
+  vars:
+    init: true
+  vars_files:
+    - ./vars/config.yml
   roles:
-    - local_prepare
+    - jdk
+    - hadoop
+    - spark
+    - mesos
 
 - name: Install standalone hadoop
   hosts: hadoop_standalone
@@ -13,11 +19,13 @@
   vars:
     cluster_mode: false
     fresh_unzip: false
-    drop_data: false
-
+    drop_data: true
   roles:
+    - system
     - jdk
     - hadoop
+    - spark
+    - mesos
 
 - name: Install hadoop cluster
   hosts: hadoop_cluster
@@ -25,9 +33,11 @@
   become_method: sudo
   vars:
     cluster_mode: true
-    # fresh_unzip: true
-    # drop_data: true
-
+    fresh_unzip: false
+    drop_data: true
   roles:
+    - system
     - jdk
     - hadoop
+    - spark
+    - mesos

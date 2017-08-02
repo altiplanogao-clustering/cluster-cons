@@ -1,5 +1,7 @@
 ---
 
+- set_fact:
+    hadoop_path: '{{ hadoop_conf.install_dir }}/{{ hadoop_conf.basename}}'
 # delete hadoop installation, configuration and data
 - name: delete hadoop installation
   file: path="{{ hadoop_path }}" state=absent
@@ -16,34 +18,41 @@
 
 # install hadoop files
 - name: mkdir hadoop
-  file: path="{{ hadoop_dirname }}" state=directory
+  file: path="{{ hadoop_conf.install_dir }}" state=directory
 - name: upload hadoop tar file
   copy:
-    src: "{{ playbook_dir }}/roles/local_prepare/files/{{ hadoop_tar_filename }}"
-    dest: "{{ hadoop_dirname }}/{{ hadoop_tar_filename }}"
+    src: "{{ role_path }}/{{ rcpath }}/{{ hadoop_conf.tar_file }}"
+    dest: "{{ hadoop_conf.install_dir }}/{{ hadoop_conf.tar_file }}"
 - name: check unarchive hadoop directory
   stat: path="{{ hadoop_path }}"
   register: hadoopfstat
 - name: unarchive hadoop
   unarchive:
-    src: "{{ hadoop_dirname }}/{{ hadoop_tar_filename }}"
-    dest: "{{ hadoop_dirname }}"
+    src: "{{ hadoop_conf.install_dir }}/{{ hadoop_conf.tar_file }}"
+    dest: "{{ hadoop_conf.install_dir }}"
     remote_src: True
   when: hadoopfstat.stat.isdir is not defined
 
 # export HADOOP environment variables
 - name: export HADOOP_HOME, HADOOP_PREFIX ...
-  lineinfile:
-    dest: /etc/environment
-    regexp: '^{{ item }}='
-    line: '{{ item }}={{ hadoop_dirname }}/{{ hadoop_basename }}'
-  with_items: [ "HADOOP_HOME", "HADOOP_PREFIX", "HADOOP_HDFS_HOME", "HADOOP_YARN_HOME"]
+  blockinfile:
+    path: /etc/environment
+    marker: "# {mark} HADOOP BLOCK"
+    block: |
+      HADOOP_HOME={{ hadoop_path }}
+      HADOOP_PREFIX={{ hadoop_path }}
+      HADOOP_HDFS_HOME={{ hadoop_path }}
+      HADOOP_YARN_HOME={{ hadoop_path }}
 - name: export HADOOP_HOME, HADOOP_PREFIX ... (for RedHat)
-  lineinfile:
-    dest: "{{ sys_profile }}"
-    regexp: '^export {{ item }}='
-    line: 'export {{ item }}={{ hadoop_dirname }}/{{ hadoop_basename }}'
-  with_items: [ "HADOOP_HOME", "HADOOP_PREFIX", "HADOOP_HDFS_HOME", "HADOOP_YARN_HOME"]
+  blockinfile:
+    path: "{{ sys_profile }}"
+    marker: "# {mark} HADOOP BLOCK"
+    block: |
+      export HADOOP_HOME={{ hadoop_path }}
+      export HADOOP_PREFIX={{ hadoop_path }}
+      export HADOOP_HDFS_HOME={{ hadoop_path }}
+      export HADOOP_YARN_HOME={{ hadoop_path }}
+
 #  when: ansible_os_family == "RedHat"
 - name: export HADOOP_HOME to PATH
   lineinfile:

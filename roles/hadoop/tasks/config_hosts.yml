@@ -1,11 +1,14 @@
 ---
 
+- hostname: name="{{ inventory_hostname}}"
+  # when: cluster_mode
+
 # Configure /etc/hosts
 - name: update /etc/hosts {{ ":" }} drop 127.0.0.1 to hostname (avoid address binding problem)
   lineinfile:
     dest: /etc/hosts
     regexp: '^(127\.0\.0\.1)(.*?)({{ ansible_hostname }})$'
-    line: '#\1\2\3'
+    line: '\1\2'
     backrefs: yes
   when: cluster_mode
 - name: update /etc/hosts {{ ":" }} add hostnames
@@ -23,11 +26,11 @@
 - group: name={{ hadoop_group }} state=present
 - user: name={{ item }} comment={{ item}} group={{ hadoop_group }} shell=/bin/bash password=hadoop
   with_items: "{{ hadoop_users }}"
-- authorized_key: user={{ item }} key="{{ lookup('file', '{{ playbook_dir }}/roles/local_prepare/sshkeys/{{ item }}_rsa.pub') }}"
+- authorized_key: user={{ item }} key="{{ lookup('file', '{{ role_path }}/{{ rcpath}}/sshkeys/{{ item }}_rsa.pub') }}"
   with_items: "{{ hadoop_users }}"
 - name: configure user's ssh keys
   copy:
-    src="{{ playbook_dir }}/roles/local_prepare/sshkeys/{{ item.key }}"
+    src="{{ role_path }}/{{ rcpath }}/sshkeys/{{ item.key }}"
     dest="/home/{{ item.user }}/.ssh/{{ item.file }}"
     owner="{{ item.user }}" group="{{ hadoop_group }}" mode=0600
 #  when: item.cond

@@ -1,4 +1,0 @@
-sys_bashrc: /etc/bashrc
-sys_profile: /etc/profile
-sys_envfile: /etc/profile
-dependency: []

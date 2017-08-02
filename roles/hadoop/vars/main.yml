@@ -1,5 +1,4 @@
 ---
-hadoop_dirname: /usr/lib/hadoop
 
 hadoop_group: hadoop
 hadoop_user: hadoop
@@ -13,5 +12,21 @@ hadoop_users:
   - mapred
 
 #hadoop_path = hadoop_dirname + hadoop_basename
-hadoop_path: /usr/lib/hadoop/{{ hadoop_basename }}
+# hadoop_path: /usr/lib/hadoop/{{ hadoop_basename }}
 hadoop_conf_dir: /etc/hadoop/conf
+
+hadoop_conf:
+  install_dir: /usr/lib/hadoop
+  download_27_url: http://mirrors.advancedhosters.com/apache/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz
+  download_27_checksum_sha256: sha256:D489DF3808244B906EB38F4D081BA49E50C4603DB03EFD5E594A1E98B09259C2
+  download_27_checksum_md5: md5:3455BB57E4B4906BBEA67B58CCA78FA8
+
+  download_28_url: http://mirrors.advancedhosters.com/apache/hadoop/common/hadoop-2.8.0/hadoop-2.8.0.tar.gz
+  download_28_checksum_sha256: sha256:3C0C6053651970C3CE283C100EE3E4E257C7F2DD7D7F92C98C8B0A3A440C04A0
+  download_28_checksum_md5: md5:C728A090B68D009070085367695ED507
+
+  download_url: http://mirrors.advancedhosters.com/apache/hadoop/common/hadoop-2.8.0/hadoop-2.8.0.tar.gz
+  download_checksum_sha256: sha256:3C0C6053651970C3CE283C100EE3E4E257C7F2DD7D7F92C98C8B0A3A440C04A0
+  download_checksum_md5: md5:C728A090B68D009070085367695ED507
+  tar_file: hadoop-2.8.0.tar.gz
+  basename: hadoop-2.8.0
