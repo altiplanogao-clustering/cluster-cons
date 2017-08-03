@@ -5,3 +5,4 @@ vm/.vagrant/
 *.log
 roles/**/files/hadoop*
 **/sshkeys/
+resources/

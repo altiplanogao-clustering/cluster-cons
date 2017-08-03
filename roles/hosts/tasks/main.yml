@@ -1,28 +1,37 @@
 ---
 
-- include_vars: 
-    file: '{{ playbook_dir }}/cluster_nodes.yml'
-    name: cluster_nodes
-  when: cluster_mode
 
-- hostname: name="{{ inventory_hostname}}"
-  # when: cluster_mode
+- debug: msg="will set hostname as {{ hostname }}"
+
+- hostname: name="{{ hostname }}"
+
+- include_vars: 
+    file: '{{ playbook_dir }}/conf/hosts.yml'
+    name: _temp_hosts
+- set_fact:
+    hosts_map: "{{ _temp_hosts.hosts }}"
+    hosts_list: "{{ _temp_hosts.hosts | list | map('extract', _temp_hosts.hosts) | list}}"
+- set_fact:
+    hosts: "{{ hosts_list }}"
+    slaves: "{{ groups['hdfs_slaves'] }}"
+
+# - debug: msg="{{ hosts_map[item].hostname }}"
+#   with_items: "{{ slaves }}"
 
 # Configure /etc/hosts
 - name: update /etc/hosts {{ ":" }} drop 127.0.0.1 to hostname (avoid address binding problem)
   lineinfile:
     dest: /etc/hosts
-    regexp: '^(127\.0\.0\.1)(.*?)({{ ansible_hostname }})$'
+    regexp: '^(127\.0\.0\.1)(.*?)({{ hostname }})$'
     line: '\1\2'
     backrefs: yes
-  when: cluster_mode
+
 - name: update /etc/hosts {{ ":" }} add hostnames
   lineinfile:
     dest: /etc/hosts
     # regexp: '^({{ item.ip }})?(.*?)(\s)?({{ item.hostname }})?'
     # line: '{{ item.ip }}\2 {{ item.hostname }}'
     # backrefs: yes
-    regexp: '^{{ item.ip }}(\s)*({{ item.hostname }})?$'
-    line: '{{ item.ip }} {{ item.hostname }}'
-  with_items: "{{ cluster_nodes.nodes }}"
-  when: cluster_mode
+    regexp: '^{{ item.address }}(\s)*({{ item.hostname }})?$'
+    line: '{{ item.address }} {{ item.hostname }}'
+  with_items: "{{ hosts }} "

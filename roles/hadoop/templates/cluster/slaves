@@ -1,3 +1,3 @@
-{% for node in cluster_nodes.slaves %}
-{{ node.hostname }}
+{% for node in slaves %}
+{{ hosts_map[node].hostname }}
 {% endfor %}

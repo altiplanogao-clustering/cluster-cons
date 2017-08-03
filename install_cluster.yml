@@ -4,8 +4,6 @@
   hosts: local
   vars:
     init: true
-  vars_files:
-    - ./vars/config.yml
   roles:
     - jdk
     - hadoop
@@ -13,7 +11,7 @@
     - mesos
 
 - name: Install standalone hadoop
-  hosts: hadoop_standalone
+  hosts: hadoop_alone
   become: yes
   become_method: sudo
   vars:
@@ -35,8 +33,10 @@
     cluster_mode: true
     fresh_unzip: false
     drop_data: true
-  roles:
+  roles: 
     - system
+    - common
+    - hosts
     - jdk
     - hadoop
     - spark

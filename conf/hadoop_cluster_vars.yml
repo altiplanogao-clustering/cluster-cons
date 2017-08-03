@@ -5,23 +5,23 @@ dfs_namenode_name_dir_no_protocol: "/home/{{ hdfs_user }}/hadoop-data/hdfs/namen
 dfs_namenode_name_dir: "file:///home/{{ hdfs_user }}/hadoop-data/hdfs/namenode"
 dfs_datanode_data_dir: "file:///home/{{ hdfs_user }}/hadoop-data/hdfs/datanode"
 
-fs_defaultFS: "hdfs://{{ cluster_nodes.node100.hostname }}:9000/"
-namenode_uri: "hdfs://{{ cluster_nodes.node100.hostname }}:9000/"
+fs_defaultFS: "hdfs://{{ hosts_map.node_000.hostname }}:9000/"
+namenode_uri: "hdfs://{{ hosts_map.node_000.hostname }}:9000/"
 
-mr_jobhistory_address: "{{ cluster_nodes.node101.hostname }}:10020"
-mr_jobhistory_webapp_address: "{{ cluster_nodes.node101.hostname }}:19888"
+mr_jobhistory_address: "{{ hosts_map.node_001.hostname }}:10020"
+mr_jobhistory_webapp_address: "{{ hosts_map.node_001.hostname }}:19888"
 
 
 # ResourceManager host:port for clients to submit jobs. host:port If set, overrides the hostname set in yarn.resourcemanager.hostname.
-yarn_resourcemanager_address: "{{ cluster_nodes.node101.hostname }}:11000"
+yarn_resourcemanager_address: "{{ hosts_map.node_001.hostname }}:11000"
 # ResourceManager host:port for ApplicationMasters to talk to Scheduler to obtain resources.  host:port If set, overrides the hostname set in yarn.resourcemanager.hostname.
-yarn_resourcemanager_scheduler_address: "{{ cluster_nodes.node101.hostname }}:11001"
+yarn_resourcemanager_scheduler_address: "{{ hosts_map.node_001.hostname }}:11001"
 # ResourceManager host:port for NodeManagers. host:port If set, overrides the hostname set in yarn.resourcemanager.hostname.
-yarn_resourcemanager_resource_tracker_address: "{{ cluster_nodes.node101.hostname }}:11002"
+yarn_resourcemanager_resource_tracker_address: "{{ hosts_map.node_001.hostname }}:11002"
 # ResourceManager host:port for administrative commands.  host:port If set, overrides the hostname set in yarn.resourcemanager.hostname.
-yarn_resourcemanager_admin_address: "{{ cluster_nodes.node101.hostname }}:11003"
+yarn_resourcemanager_admin_address: "{{ hosts_map.node_001.hostname }}:11003"
 # ResourceManager web-ui host:port. host:port If set, overrides the hostname set in yarn.resourcemanager.hostname.
-yarn_resourcemanager_webapp_address: "{{ cluster_nodes.node101.hostname }}:8088"
+yarn_resourcemanager_webapp_address: "{{ hosts_map.node_001.hostname }}:8088"
 
 
-yarn_web_proxy_address:  "{{ cluster_nodes.node101.hostname }}:11011"
+yarn_web_proxy_address:  "{{ hosts_map.node_001.hostname }}:11011"

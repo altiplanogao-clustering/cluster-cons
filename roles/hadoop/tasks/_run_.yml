@@ -2,25 +2,21 @@
 
 - setup:
 
-- include_vars: '{{ item }}'
+- name: os dependened vars
+  include_vars: '{{ item }}'
   with_first_found:
   - files:
       - '{{ ansible_os_family }}.yml'
       - 'default.yml'
-    paths: '../vars/os'
+    paths: '{{ role_path }}/vars/os'
 
 - include_vars: 
-    file: '{{ playbook_dir }}/cluster_nodes.yml'
+    file: '{{ playbook_dir }}/conf/hosts.yml'
     name: cluster_nodes
-  when: cluster_mode
-- include_vars: 
-    file: '{{ playbook_dir }}/vars/hadoop_cluster_vars.yml'
+- name: include deploy vars
+  include_vars: 
+    file: "{{ playbook_dir}}/conf/{{ cluster_mode | ternary('hadoop_cluster_vars.yml','hadoop_standalone_vars.yml') }}"
     name: hadoop_vars
-  when: cluster_mode
-- include_vars: 
-    file: '{{ playbook_dir }}/vars/hadoop_standalone_vars.yml'
-    name: hadoop_vars
-  when: not cluster_mode
 - set_fact: is_namenode=true is_resource_mgr=true
   when: not cluster_mode
 
