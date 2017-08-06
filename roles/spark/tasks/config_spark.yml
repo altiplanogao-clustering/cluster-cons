@@ -1,0 +1,47 @@
+---
+
+- name: mkdir spark_conf_dir
+  file: path="{{ spark_conf_dir }}" state=directory
+
+- set_fact: template_dir="templates/{{ 'cluster_conf' if cluster_mode else 'standalone_conf' }}"
+- name: copy conf
+  template: src='{{ item.src }}' dest="{{ spark_conf_dir }}/{{ item.path | regex_replace('(\.template)?$') }}" mode='{{ item.mode }}'
+  with_filetree: '{{ template_dir}}/'
+
+- name: export SPARK_CONF_DIR
+  lineinfile:
+    dest: /etc/environment
+    regexp: '^SPARK_CONF_DIR='
+    line: SPARK_CONF_DIR={{ spark_conf_dir }}
+- name: export SPARK_CONF_DIR ...
+  lineinfile:
+    dest: "{{ sys_profile }}"
+    regexp: '^export SPARK_CONF_DIR='
+    line: export SPARK_CONF_DIR={{ spark_conf_dir }}
+
+# Setup user specified environment
+- name: mkdir SPARK_LOG_DIR
+  file: path="/home/{{ item }}/logs" state=directory  owner="{{ item }}" group="{{ spark_group}}"
+  with_items: "{{ spark_users }}"
+- file: path="/home/{{ item }}/.pam_environment" state=touch owner={{ item }} group={{ spark_group }} mode=0644
+  with_items: "{{ spark_users }}"
+- name: export LOG_DIRs
+  blockinfile:
+    dest: /home/{{ item }}/.pam_environment
+    backup: yes
+    block: |
+      SPARK_PID_DIR=/home/{{ item }}/logs
+      SPARK_LOG_DIR=/home/{{ item }}/logs
+  with_items: "{{ spark_users }}"
+- name: export LOG_DIRs
+  blockinfile:
+    dest: /home/{{ item[1] }}/{{ item[0] }}
+    # path: /home/{{ item }}/{{ user_bashrc }}
+    backup: yes
+    block: |
+      export SPARK_PID_DIR=/home/{{ item[1] }}/logs
+      export SPARK_LOG_DIR=/home/{{ item[1] }}/logs
+  with_nested:
+    - "{{ user_env_files}}"
+    - "{{ spark_users }}"
+

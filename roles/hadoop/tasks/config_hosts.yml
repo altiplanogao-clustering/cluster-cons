@@ -3,7 +3,7 @@
 
 # Configure Users
 - group: name={{ hadoop_group }} state=present
-- user: name={{ item }} comment={{ item}} group={{ hadoop_group }} shell=/bin/bash password=hadoop
+- user: name={{ item }} comment={{ item}} group={{ hadoop_group }} shell=/bin/bash password='{{ hadoop_password }}'
   with_items: "{{ hadoop_users }}"
 - authorized_key: user={{ item }} key="{{ lookup('file', '{{ role_path }}/{{ rcpath}}/sshkeys/{{ item }}_rsa.pub') }}"
   with_items: "{{ hadoop_users }}"
@@ -17,9 +17,11 @@
     - {key: hadoop_rsa, file: id_rsa, user: "{{ hadoop_user }}", cond: "{{ is_resource_mgr or is_namenode }}" }
     - {key: hdfs_rsa, file: id_rsa, user: "{{ hdfs_user }}", cond: "{{ is_namenode }}"}
     - {key: yarn_rsa, file: id_rsa, user: "{{ yarn_user }}", cond: "{{ is_resource_mgr }}"}
+    - {key: mapred_rsa, file: id_rsa, user: "{{ mapred_user }}", cond: true}
     - {key: hadoop_rsa.pub, file: id_rsa.pub, user: "{{ hadoop_user }}", cond: true}
     - {key: hdfs_rsa.pub, file: id_rsa.pub, user: "{{ hdfs_user }}", cond: true}
     - {key: yarn_rsa.pub, file: id_rsa.pub, user: "{{ yarn_user }}", cond: true}
+    - {key: mapred_rsa.pub, file: id_rsa.pub, user: "{{ mapred_user }}", cond: true}
 
 # Configure ~user/.ssh/known_hosts
 - name: ssh-keyscan {{ ":" }} localhost

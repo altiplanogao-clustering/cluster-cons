@@ -1,5 +1,11 @@
 ---
 
+spark_group: hadoop
+spark_users:
+  - mapred
+
+spark_conf_dir: /etc/spark/conf
+
 spark_conf:
   install_dir: /opt/spark
   no_hadoop:

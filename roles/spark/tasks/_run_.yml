@@ -2,3 +2,5 @@
 
 - include: install_spark.yml spark_res='{{ spark_conf.no_hadoop }}'
 - include: install_spark.yml spark_res='{{ spark_conf.with_hadoop }}'
+
+- include: config_spark.yml

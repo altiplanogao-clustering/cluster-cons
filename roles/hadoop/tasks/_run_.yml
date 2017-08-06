@@ -29,3 +29,4 @@
 - include: config_firewall.yml
 - include: config_daemons.yml
 - include: launch_daemons.yml
+  when: start_on_finish

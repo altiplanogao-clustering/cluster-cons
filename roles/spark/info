@@ -1,0 +1,1 @@
+1 Start hadoop before spark-shell, spark-shell depends on hdfs (configured in HADOOP_CONF_DIR/core-site.xml). 

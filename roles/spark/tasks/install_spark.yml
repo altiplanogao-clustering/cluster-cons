@@ -28,30 +28,24 @@
   when: sparkfstat.stat.isdir is not defined
 
 # export HADOOP environment variables
-# - name: export HADOOP_HOME, HADOOP_PREFIX ...
-#   blockinfile:
-#     path: /etc/environment
-#     marker: "# {mark} HADOOP BLOCK"
-#     block: |
-#       HADOOP_HOME={{ spark_path }}
-#       HADOOP_PREFIX={{ spark_path }}
-#       HADOOP_HDFS_HOME={{ spark_path }}
-#       HADOOP_YARN_HOME={{ spark_path }}
-# - name: export HADOOP_HOME, HADOOP_PREFIX ... (for RedHat)
-#   blockinfile:
-#     path: "{{ sys_profile }}"
-#     marker: "# {mark} HADOOP BLOCK"
-#     block: |
-#       export HADOOP_HOME={{ spark_path }}
-#       export HADOOP_PREFIX={{ spark_path }}
-#       export HADOOP_HDFS_HOME={{ spark_path }}
-#       export HADOOP_YARN_HOME={{ spark_path }}
+- name: export SPARK_HOME ...
+  blockinfile:
+    path: /etc/environment
+    marker: "# {mark} SPARK BLOCK"
+    block: |
+      SPARK_HOME={{ spark_path }}
+- name: export SPARK_HOME ... 
+  blockinfile:
+    path: "{{ sys_profile }}"
+    marker: "# {mark} SPARK BLOCK"
+    block: |
+      export SPARK_HOME={{ spark_path }}
 
-# #  when: ansible_os_family == "RedHat"
-# - name: export HADOOP_HOME to PATH
-#   lineinfile:
-#     dest: '{{ sys_profile }}'
-#     line: 'export PATH=$PATH:$HADOOP_HOME/bin'
+#  when: ansible_os_family == "RedHat"
+- name: export SPARK_HOME to PATH
+  lineinfile:
+    dest: '{{ sys_profile }}'
+    line: 'export PATH=$PATH:$SPARK_HOME/bin'
 # - name: fetch JAVA_HOME
 #   command: /bin/bash -l -c "echo $JAVA_HOME"
 #   changed_when: false

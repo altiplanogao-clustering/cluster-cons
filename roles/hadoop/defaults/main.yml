@@ -1,0 +1,6 @@
+---
+start_on_finish: true
+run_demo: false
+
+# passw0rd
+hadoop_password: $6$VKqoODAnoEqhS$QhuYlkAChxm5P1FLgrPXJO4OrdM/qRBsfnBr6Jsfw18GserWNBSJ5kKl64nX9ouqdnBeGSzjMSd5z1SfFMgpE1

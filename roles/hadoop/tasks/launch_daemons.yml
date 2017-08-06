@@ -10,9 +10,9 @@
 - name: prepare script directory
   file: path="{{ script_path}}" owner={{ nobody}} group={{ nogroup}} mode=0777 state=directory
 - name: copy launch daemon script
-  copy: src=scripts dest="{{ script_path}}" owner={{ nobody }} group="{{ hadoop_group }}" mode=0755 directory_mode=0755
+  copy: src='templates/scripts' dest="{{ script_path}}" owner={{ nobody }} group="{{ hadoop_group }}" mode=0755 directory_mode=0755
 - name: configure mapred demo script
-  template: src="scripts/mapred_demo.sh" dest="{{ script_path}}/scripts/mapred_demo.sh" owner={{ nobody }} group="{{ hadoop_group }}" mode=0755 force=yes
+  template: src="templates/scripts/mapred_demo.sh" dest="{{ script_path}}/scripts/mapred_demo.sh" owner={{ nobody }} group="{{ hadoop_group }}" mode=0755 force=yes
 
 - name: format namenode
   raw: su - {{ hdfs_user }} -l -c "{{ script_path}}/scripts/format_namenode.sh"
@@ -53,7 +53,7 @@
   when: is_resource_mgr
 - name: run mapred demo
   raw: su - {{ mapred_user }} -l -c "{{ script_path }}/scripts/mapred_demo.sh"
-  when: is_resource_mgr
+  when: is_resource_mgr and run_demo
   ignore_errors: yes
 
 
