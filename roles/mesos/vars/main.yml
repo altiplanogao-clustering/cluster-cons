@@ -1,6 +1,6 @@
 ---
 
-mesos_conf:
+mesos_res:
   install_dir: /opt/mesos
   url: http://archive.apache.org/dist/mesos/1.3.0/mesos-1.3.0.tar.gz
   tar_file: mesos-1.3.0.tar.gz

@@ -1,0 +1,24 @@
+---
+dependencies:
+  # Install a few utility tools.
+  - tar
+  - wget
+  - git
+  # Install the latest OpenJDK.
+  # openjdk-7-jdk
+  # Install autotools (Only necessary if building from git repository).
+  - autoconf
+  - libtool
+  # Install other Mesos dependencies.
+  - build-essential
+  - python-dev
+  - python-six
+  - python-virtualenv
+  - libcurl4-nss-dev
+  - libsasl2-dev
+  - libsasl2-modules
+  - maven
+  - libapr1-dev
+  - libsvn-dev
+  # ?
+  - zlib1g-dev
