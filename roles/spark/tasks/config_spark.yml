@@ -28,19 +28,20 @@
 - name: export LOG_DIRs
   blockinfile:
     dest: /home/{{ item }}/.pam_environment
-    backup: yes
+    marker: "# {mark} SPARK BLOCK"
     block: |
       SPARK_PID_DIR=/home/{{ item }}/logs
       SPARK_LOG_DIR=/home/{{ item }}/logs
+      SPARK_WORKER_DIR=/home/{{ item }}/spark_worker
   with_items: "{{ spark_users }}"
 - name: export LOG_DIRs
   blockinfile:
     dest: /home/{{ item[1] }}/{{ item[0] }}
-    # path: /home/{{ item }}/{{ user_bashrc }}
-    backup: yes
+    marker: "# {mark} SPARK BLOCK"
     block: |
       export SPARK_PID_DIR=/home/{{ item[1] }}/logs
       export SPARK_LOG_DIR=/home/{{ item[1] }}/logs
+      export SPARK_WORKER_DIR=/home/{{ item[1] }}/spark_worker
   with_nested:
     - "{{ user_env_files}}"
     - "{{ spark_users }}"

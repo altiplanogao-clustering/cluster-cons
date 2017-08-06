@@ -45,6 +45,7 @@
 - name: export LOG_DIRs
   blockinfile:
     dest: /home/{{ item }}/.pam_environment
+    marker: "# {mark} SPARK BLOCK"
     backup: yes
     block: |
       HADOOP_LOG_DIR=/home/{{ item }}/logs
@@ -55,6 +56,7 @@
 - name: export LOG_DIRs
   blockinfile:
     dest: /home/{{ item[1] }}/{{ item[0] }}
+    marker: "# {mark} SPARK BLOCK"
     # path: /home/{{ item }}/{{ user_bashrc }}
     backup: yes
     block: |
