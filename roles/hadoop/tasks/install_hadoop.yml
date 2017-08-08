@@ -1,7 +1,7 @@
 ---
 
 - set_fact:
-    hadoop_path: '{{ hadoop_conf.install_dir }}/{{ hadoop_conf.basename}}'
+    hadoop_path: '{{ pkg_ic.install_path }}/{{ pkg_ic.basename}}'
 # delete hadoop installation, configuration and data
 - name: delete hadoop installation
   file: path="{{ hadoop_path }}" state=absent
@@ -16,22 +16,12 @@
     - "{{ hadoop_users }}"
     - ['hadoop-data','logs']
 
-# install hadoop files
-- name: mkdir hadoop
-  file: path="{{ hadoop_conf.install_dir }}" state=directory
-- name: upload hadoop tar file
-  copy:
-    src: "{{ role_path }}/{{ rcpath }}/{{ hadoop_conf.tar_file }}"
-    dest: "{{ hadoop_conf.install_dir }}/{{ hadoop_conf.tar_file }}"
-- name: check unarchive hadoop directory
-  stat: path="{{ hadoop_path }}"
-  register: hadoopfstat
-- name: unarchive hadoop
-  unarchive:
-    src: "{{ hadoop_conf.install_dir }}/{{ hadoop_conf.tar_file }}"
-    dest: "{{ hadoop_conf.install_dir }}"
-    remote_src: True
-  when: hadoopfstat.stat.isdir is not defined
+
+- name: download and unzip
+  include_role:
+    name: basic/download_and_unzip
+  vars:
+    pkg_conf: '{{ pkg_ic }}'
 
 # export HADOOP environment variables
 - name: export HADOOP_HOME, HADOOP_PREFIX ...

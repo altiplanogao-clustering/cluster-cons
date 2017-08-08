@@ -1,7 +1,8 @@
 ---
 
-mesos_res:
-  install_dir: /opt/mesos
+pkg_ic:
+  name: mesos
+  install_path: /opt/mesos
   url: http://archive.apache.org/dist/mesos/1.3.0/mesos-1.3.0.tar.gz
-  tar_file: mesos-1.3.0.tar.gz
+  file: mesos-1.3.0.tar.gz
   basename: mesos-1.3.0

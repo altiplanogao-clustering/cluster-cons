@@ -13,25 +13,30 @@
 - set_fact:
     mesos_path: '{{ mesos_res.install_dir }}/{{ mesos_res.basename}}'
 
-# install spark files
-- name: mkdir mesos
-  file: path="{{ mesos_res.install_dir }}" state=directory
-- name: upload mesos tar file
-  copy:
-    src: "{{ role_path }}/{{ rcpath }}/{{ mesos_res.tar_file }}"
-    dest: "{{ mesos_res.install_dir }}/{{ mesos_res.tar_file }}"
-- name: check unarchive mesos directory
-  stat: path="{{ mesos_path }}"
-  register: mesosfstat
-- name: unarchive mesos
-  unarchive:
-    src: "{{ mesos_res.install_dir }}/{{ mesos_res.tar_file }}"
-    dest: "{{ mesos_res.install_dir }}"
-    remote_src: True
-  when: mesosfstat.stat.isdir is not defined
-
+- name: download and unzip
+  include_role:
+    name: basic/download_and_unzip
+  vars:
+    pkg_conf: '{{ pkg_ic }}'
 
 # ssh setting
 - name: Install the dependence packages
   package: name="{{ item }}" state=present
   with_items: '{{ dependencies }}'
+
+# # make install
+# - name: make install
+#   shell: |
+#     mkdir build
+#     cd build
+#     ../configure
+#     make
+#   args:
+#     chdir: "{{ pkg_ic.install_path }}/{{ pkg_ic.basename}}"
+
+# - name: check python installation
+#   shell: "{{ python_x}} --version 2>&1"
+#   register: python_v
+#   changed_when: False
+#   failed_when: "( python_v | failed ) or ( python_v_expect not in python_v.stdout )"
+

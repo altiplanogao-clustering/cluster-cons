@@ -1,8 +1,0 @@
----
-
-jdk_conf:
-  repo_install: false
-  install_dir: /usr/lib/jdk
-  url: http://download.oracle.com/
-  tar_file: jdk-8u144-linux-x64.tar.gz
-  basename: jdk1.8.0_144

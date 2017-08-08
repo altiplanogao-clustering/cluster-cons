@@ -1,6 +1,12 @@
 ---
 
 - set_fact:
+    temp_ic:
+      name: spark
+      install_path: '{{ spark_conf.install_dir }}'
+      url: '{{ spark_res.url }}'
+      file: '{{ spark_res.file }}'
+      basename: '{{ spark_res.basename }}'
     spark_path: '{{ spark_conf.install_dir }}/{{ spark_res.basename}}'
 # delete spark installation, configuration and data
 - name: delete spark installation
@@ -11,21 +17,12 @@
   when: (fresh_unzip is defined) and fresh_unzip
 
 # install spark files
-- name: mkdir spark
-  file: path="{{ spark_conf.install_dir }}" state=directory
-- name: upload spark tar file
-  copy:
-    src: "{{ role_path }}/{{ rcpath }}/{{ spark_res.tar_file }}"
-    dest: "{{ spark_conf.install_dir }}/{{ spark_res.tar_file }}"
-- name: check unarchive spark directory
-  stat: path="{{ spark_path }}"
-  register: sparkfstat
-- name: unarchive spark
-  unarchive:
-    src: "{{ spark_conf.install_dir }}/{{ spark_res.tar_file }}"
-    dest: "{{ spark_conf.install_dir }}"
-    remote_src: True
-  when: sparkfstat.stat.isdir is not defined
+
+- name: download and unzip
+  include_role:
+    name: basic/download_and_unzip
+  vars:
+    pkg_conf: '{{ temp_ic }}'
 
 # export HADOOP environment variables
 - name: export SPARK_HOME ...
