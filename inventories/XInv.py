@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+__version__ = '1.1'
+__all__ = [
+  'XInv'
+]
 
 import sys
 import os
@@ -15,7 +19,7 @@ try:
 except ImportError:
   import simplejson as json
 
-class XInventory(object):
+class XInv(object):
 
   def __init__(self, host_files = [], group_files = []):
     # self.
@@ -31,7 +35,7 @@ class XInventory(object):
     return {"_meta": {"hostvars": {}}}
 
   def parse_cli_args(self):
-    parser = argparse.ArgumentParser(description='Produce an Ansible Inventory file based on EC2')
+    parser = argparse.ArgumentParser(description='Produce an Ansible Inventory file based on ...')
     parser.add_argument('--list', action='store_true', default=True,
                         help='List instances (default: True)')
     parser.add_argument('--host', action='store',
@@ -39,12 +43,14 @@ class XInventory(object):
     self.args = parser.parse_args()
 
   def _load_hostfile(self, hostfile):
+    _host_default_vars = "host_default_vars"
+    _hosts = "hosts"
     with open(hostfile, 'r') as stream:
-      file_content = {"host_default_vars" : {}, "hosts": {}}
+      file_content = {_host_default_vars : {}, _hosts: {}}
       try:
         file_content = yaml.load(stream)
-        host_default = file_content["host_default_vars"]
-        host_nodes = file_content["hosts"]
+        host_default = file_content[_host_default_vars]
+        host_nodes = file_content[_hosts]
         for _node in host_nodes:
           host = copy.deepcopy(host_nodes[_node])
           vars_cp = copy.deepcopy(host_default)
@@ -74,13 +80,13 @@ class XInventory(object):
         setattr(self, groupfile, "load failed.");
 
   def _load_resource(self, host_files = [], group_files = []):
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    dir_path = os.path.join(dir_path, "conf")
+    # dir_path = os.path.dirname(os.path.realpath(__file__))
+    # dir_path = os.path.join(dir_path, "conf")
     for hostfile in host_files:
-      hostfile = os.path.join(dir_path, hostfile)
+      # hostfile = os.path.join(dir_path, hostfile)
       self._load_hostfile(hostfile)
     for groupfile in group_files:
-      groupfile = os.path.join(dir_path, groupfile)
+      # groupfile = os.path.join(dir_path, groupfile)
       self._load_groupfile(groupfile)
 
   def _write_meta(self):
@@ -102,4 +108,3 @@ class XInventory(object):
 
 
 
-XInventory(['hosts.yml'], ["hadoop_groups.yml"])

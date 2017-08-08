@@ -3,6 +3,8 @@
 vm/.vagrant/
 **/*.tar.gz
 *.log
+*.pyc
+.idea/
 roles/**/files/hadoop*
 **/sshkeys/
 resources/
