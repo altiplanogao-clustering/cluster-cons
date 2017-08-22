@@ -13,11 +13,19 @@
 - set_fact:
     mesos_path: '{{ mesos_res.install_dir }}/{{ mesos_res.basename}}'
 
-- name: download and unzip
-  include_role:
-    name: basic/download_and_unzip
-  vars:
-    pkg_conf: '{{ pkg_ic }}'
+# Download and unzip
+- name: Present install path '{{ "[" }}{{ pkg_ic.install_path }}{{ "]" }}'
+  file: path="{{ pkg_ic.install_path }}" state=directory
+- name: Download {{ pkg_ic.file }}
+  cached_get_url:
+    cached: "{{ resource_cache }}/{{ pkg_ic.file }}"
+    url: "{{ pkg_ic.url }}"
+    dest: '{{ pkg_ic.install_path }}/{{ pkg_ic.file }}'
+- name: Unarchive package
+  unarchive:
+    src: "{{ pkg_ic.install_path }}/{{ pkg_ic.file }}"
+    dest: "{{ pkg_ic.install_path }}"
+    remote_src: yes
 
 # ssh setting
 - name: Install the dependence packages

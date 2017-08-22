@@ -1,7 +1,7 @@
 ---
 
 - set_fact:
-    temp_ic:
+    pkg_ic:
       name: spark
       install_path: '{{ spark_conf.install_dir }}'
       url: '{{ spark_res.url }}'
@@ -17,12 +17,18 @@
   when: (fresh_unzip is defined) and fresh_unzip
 
 # install spark files
-
-- name: download and unzip
-  include_role:
-    name: basic/download_and_unzip
-  vars:
-    pkg_conf: '{{ temp_ic }}'
+- name: Present install path '{{ "[" }}{{ pkg_ic.install_path }}{{ "]" }}'
+  file: path="{{ pkg_ic.install_path }}" state=directory
+- name: Download {{ pkg_ic.file }}
+  cached_get_url:
+    cached: "{{ resource_cache }}/{{ pkg_ic.file }}"
+    url: "{{ pkg_ic.url }}"
+    dest: '{{ pkg_ic.install_path }}/{{ pkg_ic.file }}'
+- name: Unarchive package
+  unarchive:
+    src: "{{ pkg_ic.install_path }}/{{ pkg_ic.file }}"
+    dest: "{{ pkg_ic.install_path }}"
+    remote_src: yes
 
 # export HADOOP environment variables
 - name: export SPARK_HOME ...
@@ -42,7 +48,7 @@
 - name: export SPARK_HOME to PATH
   lineinfile:
     dest: '{{ sys_profile }}'
-    line: 'export PATH=$PATH:$SPARK_HOME/bin'
+    line: 'export PATH=$SPARK_HOME/bin:$PATH'
 # - name: fetch JAVA_HOME
 #   command: /bin/bash -l -c "echo $JAVA_HOME"
 #   changed_when: false
